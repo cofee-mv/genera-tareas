@@ -1,0 +1,96 @@
+<!-- src/app/features/proyectos/form/proyecto-form.component.html -->
+<div class="form-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ isEditing() ? 'Editar Proyecto' : 'Nuevo Proyecto' }}</h1>
+      <p class="page-subtitle">{{ isEditing() ? 'Actualiza la información del proyecto' : 'Completa los datos para crear un nuevo proyecto' }}</p>
+    </div>
+    <a routerLink="/proyectos" class="btn btn-secondary">← Volver</a>
+  </div>
+
+  <div class="form-card">
+    @if (loadingData()) {
+      <div class="loading-spinner"><div class="spinner"></div></div>
+    } @else {
+
+      @if (error()) {
+        <div class="alert alert-error">{{ error() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label class="form-label" for="proj-nombre">
+            Nombre del proyecto <span class="required">*</span>
+          </label>
+          <input
+            id="proj-nombre"
+            type="text"
+            class="form-control"
+            [class.is-invalid]="nombreCtrl.invalid && nombreCtrl.touched"
+            formControlName="nombre"
+            placeholder="Ej: Sistema de facturación"
+          />
+          @if (nombreCtrl.invalid && nombreCtrl.touched) {
+            <span class="form-error">
+              @if (nombreCtrl.errors?.['required']) { El nombre es requerido. }
+              @else if (nombreCtrl.errors?.['minlength']) { Mínimo 3 caracteres. }
+              @else if (nombreCtrl.errors?.['maxlength']) { Máximo 150 caracteres. }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="proj-descripcion">Descripción</label>
+          <textarea
+            id="proj-descripcion"
+            class="form-control"
+            [class.is-invalid]="descripcionCtrl.invalid && descripcionCtrl.touched"
+            formControlName="descripcion"
+            placeholder="Describe el objetivo del proyecto..."
+            rows="4"
+          ></textarea>
+          @if (descripcionCtrl.errors?.['maxlength'] && descripcionCtrl.touched) {
+            <span class="form-error">Máximo 500 caracteres.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="proj-estado">Estado <span class="required">*</span></label>
+          <select id="proj-estado" class="form-control" formControlName="estado">
+            <option value="activo">Activo</option>
+            <option value="pausado">Pausado</option>
+            <option value="completado">Completado</option>
+          </select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="proj-inicio">Fecha de Inicio</label>
+            <input id="proj-inicio" type="date" class="form-control" formControlName="fecha_inicio" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="proj-fin">Fecha de Fin</label>
+            <input id="proj-fin" type="date" class="form-control" formControlName="fecha_fin" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a routerLink="/proyectos" class="btn btn-secondary">Cancelar</a>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="loading()"
+            id="guardar-proyecto-btn"
+          >
+            @if (loading()) {
+              <div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>
+              Guardando...
+            } @else {
+              {{ isEditing() ? '💾 Actualizar Proyecto' : '✅ Crear Proyecto' }}
+            }
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

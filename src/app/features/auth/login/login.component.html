@@ -1,0 +1,108 @@
+<!-- src/app/features/auth/login/login.component.html -->
+<div class="auth-page">
+  <div class="auth-bg"></div>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <!-- Header -->
+      <div class="auth-header">
+        <div class="auth-logo">
+          <span class="logo-icon">⚡</span>
+        </div>
+        <h1 class="auth-title">Bienvenido de vuelta</h1>
+        <p class="auth-subtitle">Inicia sesión en TaskFlow CBA</p>
+      </div>
+
+      <!-- Error Alert -->
+      @if (error()) {
+        <div class="alert alert-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {{ error() }}
+        </div>
+      }
+
+      <!-- Form -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label class="form-label" for="email">
+            Correo electrónico <span class="required">*</span>
+          </label>
+          <input
+            id="email"
+            type="email"
+            class="form-control"
+            [class.is-invalid]="emailCtrl.invalid && emailCtrl.touched"
+            formControlName="email"
+            placeholder="correo@ejemplo.com"
+            autocomplete="email"
+          />
+          @if (emailCtrl.invalid && emailCtrl.touched) {
+            <span class="form-error">
+              @if (emailCtrl.errors?.['required']) { El correo es requerido. }
+              @else if (emailCtrl.errors?.['email']) { Ingresa un correo válido. }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">
+            Contraseña <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              class="form-control"
+              [class.is-invalid]="passwordCtrl.invalid && passwordCtrl.touched"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+            <button type="button" class="toggle-password" (click)="togglePassword()">
+              @if (showPassword()) {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              } @else {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (passwordCtrl.invalid && passwordCtrl.touched) {
+            <span class="form-error">
+              @if (passwordCtrl.errors?.['required']) { La contraseña es requerida. }
+              @else if (passwordCtrl.errors?.['minlength']) { Mínimo 6 caracteres. }
+            </span>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary w-full btn-lg"
+          [disabled]="loading()"
+          id="login-submit-btn"
+        >
+          @if (loading()) {
+            <div class="spinner" style="width:18px;height:18px;border-width:2px;"></div>
+            Iniciando sesión...
+          } @else {
+            Iniciar Sesión
+          }
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>¿No tienes cuenta?
+          <a routerLink="/auth/registro" class="auth-link">Regístrate aquí</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

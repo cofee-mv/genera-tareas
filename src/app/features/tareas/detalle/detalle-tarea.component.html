@@ -1,0 +1,107 @@
+<div class="container-detalle">
+  <div class="encabezado">
+    <button class="btn btn-volver" (click)="volver()">← Volver</button>
+    <h1>Detalle de Tarea</h1>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div *ngIf="cargando" class="cargando">Cargando tarea...</div>
+
+  <div *ngIf="!cargando && tarea" class="contenido">
+    <!-- Información Principal -->
+    <div class="tarea-info">
+      <div class="seccion">
+        <h2>{{ tarea.titulo }}</h2>
+        <p class="descripcion">{{ tarea.descripcion || 'Sin descripción' }}</p>
+      </div>
+
+      <!-- Detalles -->
+      <div class="detalles">
+        <div class="detalle-item">
+          <label>Proyecto:</label>
+          <span>{{ tarea.proyecto?.nombre || 'N/A' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <label>Creado por:</label>
+          <span>{{ tarea.creado_por?.nombre || 'N/A' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <label>Asignado a:</label>
+          <span>{{ tarea.asignado?.nombre || 'Sin asignar' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <label>Prioridad:</label>
+          <span [ngClass]="getClasePrioridad(tarea.prioridad)" class="badge">
+            {{ tarea.prioridad }}
+          </span>
+        </div>
+
+        <div class="detalle-item">
+          <label>Estado:</label>
+          <span [ngClass]="getClaseEstado(tarea.estado)" class="badge">
+            {{ tarea.estado }}
+          </span>
+        </div>
+
+        <div class="detalle-item">
+          <label>Fecha Límite:</label>
+          <span>{{ tarea.fecha_limite ? (tarea.fecha_limite | date:'medium') : 'Sin fecha' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <label>Creado:</label>
+          <span>{{ tarea.fecha_creacion | date:'medium' }}</span>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="botones-accion">
+        <button class="btn btn-editar" (click)="editarTarea()">Editar</button>
+        <button class="btn btn-eliminar" (click)="eliminarTarea()">Eliminar</button>
+      </div>
+    </div>
+
+    <!-- Comentarios -->
+    <div class="comentarios-seccion">
+      <h3>Comentarios</h3>
+
+      <div *ngIf="errorComentario" class="alert alert-error">{{ errorComentario }}</div>
+
+      <!-- Lista de Comentarios -->
+      <div class="lista-comentarios">
+        <div *ngFor="let comentario of comentarios" class="comentario">
+          <div class="comentario-encabezado">
+            <strong>{{ comentario.usuario?.nombre || 'Usuario Desconocido' }}</strong>
+            <span class="fecha">{{ comentario.fecha_creacion | date:'short' }}</span>
+          </div>
+          <p class="texto-comentario">{{ comentario.comentario }}</p>
+        </div>
+
+        <div *ngIf="comentarios.length === 0" class="sin-comentarios">
+          <p>No hay comentarios aún</p>
+        </div>
+      </div>
+
+      <!-- Formulario para Nuevo Comentario -->
+      <form [formGroup]="formularioComentario" (ngSubmit)="agregarComentario()" class="formulario-comentario">
+        <textarea
+          formControlName="comentario"
+          placeholder="Escriba un comentario..."
+          class="entrada-comentario"
+          rows="3"
+        ></textarea>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="cargandoComentario || formularioComentario.invalid"
+        >
+          {{ cargandoComentario ? 'Enviando...' : 'Enviar Comentario' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

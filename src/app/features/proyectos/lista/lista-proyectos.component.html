@@ -1,0 +1,125 @@
+<!-- src/app/features/proyectos/lista/lista-proyectos.component.html -->
+<div class="proyectos-page">
+
+  <!-- Toast -->
+  @if (toast()) {
+    <div class="toast-container">
+      <div class="toast" [class]="'toast-' + toast()!.type">
+        {{ toast()!.type === 'success' ? '✅' : '❌' }} {{ toast()!.msg }}
+      </div>
+    </div>
+  }
+
+  <!-- Confirm Delete Modal -->
+  @if (confirmDeleteId()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">⚠️ Eliminar Proyecto</h3>
+        <p style="color:var(--text-secondary);font-size:0.9rem;">
+          ¿Estás seguro? Esta acción eliminará el proyecto y <strong>todas sus tareas</strong>. No se puede deshacer.
+        </p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="cancelDelete()">Cancelar</button>
+          <button class="btn btn-danger" (click)="deleteProyecto(confirmDeleteId()!)">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Proyectos</h1>
+      <p class="page-subtitle">{{ filteredProyectos().length }} proyecto(s) encontrado(s)</p>
+    </div>
+    <div class="page-actions">
+      <a routerLink="/proyectos/nuevo" class="btn btn-primary" id="crear-proyecto-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nuevo Proyecto
+      </a>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-bar">
+    <div class="search-input-wrapper">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input
+        type="text"
+        class="form-control search-input"
+        placeholder="Buscar proyectos..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        id="search-proyectos"
+      />
+    </div>
+    <select
+      class="form-control filter-select"
+      [(ngModel)]="estadoFiltro"
+      (change)="applyFilters()"
+      id="filtro-estado-proyectos"
+    >
+      <option value="">Todos los estados</option>
+      <option value="activo">Activo</option>
+      <option value="pausado">Pausado</option>
+      <option value="completado">Completado</option>
+    </select>
+  </div>
+
+  <!-- Lista -->
+  @if (loading()) {
+    <div class="loading-spinner"><div class="spinner"></div><p>Cargando proyectos...</p></div>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (filteredProyectos().length === 0) {
+    <div class="empty-state">
+      <span class="empty-state-icon">📁</span>
+      <h3>No hay proyectos</h3>
+      <p>Crea tu primer proyecto para comenzar a organizar tareas.</p>
+      <a routerLink="/proyectos/nuevo" class="btn btn-primary mt-4">Crear Proyecto</a>
+    </div>
+  } @else {
+    <div class="proyectos-grid">
+      @for (proyecto of filteredProyectos(); track proyecto.id) {
+        <div class="proyecto-card">
+          <div class="proyecto-card-header">
+            <div class="proyecto-icon">📁</div>
+            <span [class]="getEstadoBadge(proyecto.estado)">{{ proyecto.estado }}</span>
+          </div>
+
+          <h3 class="proyecto-nombre">{{ proyecto.nombre }}</h3>
+          <p class="proyecto-desc">{{ proyecto.descripcion || 'Sin descripción' }}</p>
+
+          <div class="proyecto-meta">
+            <div class="meta-item">
+              <div class="avatar avatar-sm">{{ getInitials(proyecto.creador?.nombre) }}</div>
+              <span class="text-xs text-muted">{{ proyecto.creador?.nombre }}</span>
+            </div>
+            @if (proyecto.fecha_fin) {
+              <span class="text-xs text-muted">
+                📅 {{ proyecto.fecha_fin | date:'dd/MM/yyyy' }}
+              </span>
+            }
+          </div>
+
+          <div class="proyecto-stats">
+            <span class="text-xs text-muted">
+              <strong style="color:var(--text-primary)">{{ proyecto.total_tareas || 0 }}</strong> tareas
+            </span>
+          </div>
+
+          <div class="proyecto-actions">
+            <a [routerLink]="['/proyectos', proyecto.id]" class="btn btn-secondary btn-sm">Ver</a>
+            @if (canEdit(proyecto)) {
+              <a [routerLink]="['/proyectos', proyecto.id, 'editar']" class="btn btn-ghost btn-sm">Editar</a>
+              <button class="btn btn-danger btn-sm" (click)="confirmDelete(proyecto.id)">Eliminar</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

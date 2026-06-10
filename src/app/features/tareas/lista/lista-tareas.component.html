@@ -1,0 +1,111 @@
+<div class="container-tareas">
+  <div class="encabezado">
+    <h1>Gestión de Tareas</h1>
+    <button class="btn btn-primary" (click)="crearTarea()">+ Nueva Tarea</button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros" [formGroup]="filtroForm">
+    <div class="filtro-grupo">
+      <input
+        type="text"
+        placeholder="Buscar por título..."
+        formControlName="busqueda"
+        class="filtro-input"
+      />
+    </div>
+
+    <div class="filtro-grupo">
+      <select formControlName="proyecto_id" class="filtro-select">
+        <option value="">Todos los proyectos</option>
+        <option *ngFor="let p of proyectos" [value]="p.id">{{ p.nombre }}</option>
+      </select>
+    </div>
+
+    <div class="filtro-grupo">
+      <select formControlName="estado" class="filtro-select">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="en_progreso">En Progreso</option>
+        <option value="completada">Completada</option>
+      </select>
+    </div>
+
+    <div class="filtro-grupo">
+      <select formControlName="prioridad" class="filtro-select">
+        <option value="">Todas las prioridades</option>
+        <option value="baja">Baja</option>
+        <option value="media">Media</option>
+        <option value="alta">Alta</option>
+      </select>
+    </div>
+
+    <button type="button" (click)="limpiarFiltros()" class="btn btn-secundario">
+      Limpiar Filtros
+    </button>
+  </div>
+
+  <!-- Mensajes -->
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <!-- Cargando -->
+  <div *ngIf="cargando" class="cargando">Cargando tareas...</div>
+
+  <!-- Lista de tareas -->
+  <div *ngIf="!cargando && tareas.length > 0" class="tabla-tareas">
+    <div class="tabla-encabezado">
+      <div class="col-titulo">Título</div>
+      <div class="col-proyecto">Proyecto</div>
+      <div class="col-prioridad">Prioridad</div>
+      <div class="col-estado">Estado</div>
+      <div class="col-fecha">Fecha Límite</div>
+      <div class="col-acciones">Acciones</div>
+    </div>
+
+    <div *ngFor="let tarea of tareas" class="tabla-fila">
+      <div class="col-titulo">
+        <a href="javascript:void(0)" (click)="verDetalle(tarea.id)" class="enlace-tarea">
+          {{ tarea.titulo }}
+        </a>
+      </div>
+      <div class="col-proyecto">{{ getNombreProyecto(tarea.proyecto_id) }}</div>
+      <div class="col-prioridad">
+        <span [ngClass]="getClasePrioridad(tarea.prioridad)" class="badge">
+          {{ tarea.prioridad }}
+        </span>
+      </div>
+      <div class="col-estado">
+        <select
+          [value]="tarea.estado"
+          (change)="cambiarEstado(tarea.id, $any($event.target).value)"
+          [ngClass]="getClaseEstado(tarea.estado)"
+          class="selector-estado"
+        >
+          <option value="pendiente">Pendiente</option>
+          <option value="en_progreso">En Progreso</option>
+          <option value="completada">Completada</option>
+        </select>
+      </div>
+      <div class="col-fecha">
+        {{ tarea.fecha_limite ? (tarea.fecha_limite | date:'short') : 'N/A' }}
+      </div>
+      <div class="col-acciones">
+        <button class="btn btn-pequeño btn-info" (click)="verDetalle(tarea.id)">
+          Ver
+        </button>
+        <button class="btn btn-pequeño btn-editar" (click)="editarTarea(tarea.id)">
+          Editar
+        </button>
+        <button class="btn btn-pequeño btn-eliminar" (click)="eliminarTarea(tarea.id)">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sin tareas -->
+  <div *ngIf="!cargando && tareas.length === 0" class="sin-tareas">
+    <p>No hay tareas que mostrar</p>
+    <button class="btn btn-primary" (click)="crearTarea()">Crear la primera tarea</button>
+  </div>
+</div>

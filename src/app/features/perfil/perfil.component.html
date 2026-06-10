@@ -1,0 +1,110 @@
+<div class="container-perfil">
+  <div class="encabezado">
+    <h1>Mi Perfil</h1>
+  </div>
+
+  <!-- Mensajes -->
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+  <div *ngIf="exitoso" class="alert alert-exito">{{ exitoso }}</div>
+
+  <!-- Tarjeta de Perfil -->
+  <div *ngIf="usuario" class="tarjeta-perfil">
+    <!-- Avatar -->
+    <div class="seccion-avatar">
+      <div class="avatar-grande">
+        <img
+          *ngIf="usuario.avatar_url"
+          [src]="usuario.avatar_url"
+          [alt]="usuario.nombre"
+        />
+        <div *ngIf="!usuario.avatar_url" class="avatar-inicial">
+          {{ usuario.nombre.charAt(0).toUpperCase() }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Información -->
+    <form [formGroup]="formulario" (ngSubmit)="guardarCambios()" class="formulario-perfil">
+      <div class="grupo-info">
+        <label>Nombre:</label>
+        <input
+          type="text"
+          formControlName="nombre"
+          [readonly]="!editando"
+          class="entrada"
+          [class.editable]="editando"
+          [class.error]="nombre?.invalid && nombre?.touched && editando"
+        />
+        <div *ngIf="nombre?.invalid && nombre?.touched && editando" class="error-mensaje">
+          <span *ngIf="nombre?.errors?.['required']">El nombre es requerido</span>
+          <span *ngIf="nombre?.errors?.['minlength']">Mínimo 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="grupo-info">
+        <label>Email:</label>
+        <input
+          type="email"
+          formControlName="email"
+          [readonly]="!editando"
+          class="entrada"
+          [class.editable]="editando"
+          [class.error]="email?.invalid && email?.touched && editando"
+        />
+        <div *ngIf="email?.invalid && email?.touched && editando" class="error-mensaje">
+          <span *ngIf="email?.errors?.['required']">El email es requerido</span>
+          <span *ngIf="email?.errors?.['email']">Email inválido</span>
+        </div>
+      </div>
+
+      <div class="grupo-info">
+        <label>Rol:</label>
+        <span class="rol-badge" [class]="usuario.rol === 'admin' ? 'rol-admin' : 'rol-miembro'">
+          {{ usuario.rol === 'admin' ? 'Administrador' : 'Miembro' }}
+        </span>
+      </div>
+
+      <div class="grupo-info">
+        <label>Fecha de Registro:</label>
+        <span class="fecha">{{ usuario.created_at | date: 'long' }}</span>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="grupo-botones">
+        <button
+          *ngIf="!editando"
+          type="button"
+          class="btn btn-editar"
+          (click)="habilitarEdicion()"
+        >
+          Editar Perfil
+        </button>
+
+        <div *ngIf="editando" class="botones-edicion">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="cargando || formulario.invalid"
+          >
+            {{ cargando ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secundario"
+            (click)="cancelarEdicion()"
+            [disabled]="cargando"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Cerrar Sesión -->
+  <div class="seccion-logout">
+    <button class="btn btn-logout" (click)="authService.cerrarSesion()">
+      Cerrar Sesión
+    </button>
+  </div>
+</div>

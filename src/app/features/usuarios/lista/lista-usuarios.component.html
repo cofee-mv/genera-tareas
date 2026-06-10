@@ -1,0 +1,57 @@
+<div class="container-usuarios">
+  <div class="encabezado">
+    <h1>Gestión de Usuarios</h1>
+  </div>
+
+  <!-- Mensajes -->
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+  <div *ngIf="exitoso" class="alert alert-exito">{{ exitoso }}</div>
+
+  <!-- Cargando -->
+  <div *ngIf="cargando" class="cargando">Cargando usuarios...</div>
+
+  <!-- Lista de usuarios -->
+  <div *ngIf="!cargando && usuarios.length > 0" class="tabla-usuarios">
+    <div class="tabla-encabezado">
+      <div class="col-nombre">Nombre</div>
+      <div class="col-email">Email</div>
+      <div class="col-rol">Rol</div>
+      <div class="col-acciones">Acciones</div>
+    </div>
+
+    <div *ngFor="let usuario of usuarios" class="tabla-fila">
+      <div class="col-nombre">
+        <div class="usuario-info">
+          <span *ngIf="usuario.avatar_url" class="avatar">
+            <img [src]="usuario.avatar_url" [alt]="usuario.nombre" />
+          </span>
+          <span *ngIf="!usuario.avatar_url" class="avatar-inicial">
+            {{ usuario.nombre.charAt(0).toUpperCase() }}
+          </span>
+          <span class="nombre">{{ usuario.nombre }}</span>
+        </div>
+      </div>
+      <div class="col-email">{{ usuario.email }}</div>
+      <div class="col-rol">
+        <span [ngClass]="getClaseRol(usuario.rol)" class="badge">
+          {{ usuario.rol }}
+        </span>
+      </div>
+      <div class="col-acciones">
+        <select
+          [value]="usuario.rol"
+          (change)="cambiarRol(usuario, $any($event.target).value)"
+          class="selector-rol"
+        >
+          <option value="miembro">Miembro</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sin usuarios -->
+  <div *ngIf="!cargando && usuarios.length === 0" class="sin-usuarios">
+    <p>No hay usuarios registrados</p>
+  </div>
+</div>

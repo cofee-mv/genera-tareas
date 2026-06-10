@@ -1,0 +1,206 @@
+<!-- src/app/features/proyectos/detalle/detalle-proyecto.component.html -->
+<div class="detalle-page">
+
+  @if (toast()) {
+    <div class="toast-container">
+      <div class="toast" [class]="'toast-' + toast()!.type">
+        {{ toast()!.type === 'success' ? '✅' : '❌' }} {{ toast()!.msg }}
+      </div>
+    </div>
+  }
+
+  @if (confirmDeleteId()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">⚠️ Eliminar Tarea</h3>
+        <p style="color:var(--text-secondary);font-size:0.9rem;">¿Eliminar esta tarea? Esta acción no se puede deshacer.</p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="cancelDelete()">Cancelar</button>
+          <button class="btn btn-danger" (click)="deleteTarea(confirmDeleteId()!)">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-spinner"><div class="spinner"></div><p>Cargando proyecto...</p></div>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (proyecto()) {
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb">
+          <a routerLink="/proyectos" class="text-muted text-sm">Proyectos</a>
+          <span class="text-muted"> / </span>
+          <span class="text-sm">{{ proyecto()!.nombre }}</span>
+        </div>
+        <h1 class="page-title">{{ proyecto()!.nombre }}</h1>
+        <p class="page-subtitle">{{ proyecto()!.descripcion || 'Sin descripción' }}</p>
+      </div>
+      <div class="page-actions">
+        <span [class]="getEstadoBadge(proyecto()!.estado)">{{ proyecto()!.estado }}</span>
+        @if (canEdit()) {
+          <a [routerLink]="['/proyectos', proyectoId, 'editar']" class="btn btn-secondary btn-sm">✏️ Editar</a>
+        }
+        <a [routerLink]="['/tareas/nueva']" [queryParams]="{proyecto: proyectoId}" class="btn btn-primary btn-sm">
+          + Nueva Tarea
+        </a>
+      </div>
+    </div>
+
+    <!-- FILTROS TAREAS -->
+    <div class="filters-bar">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          class="form-control search-input"
+          placeholder="Buscar tareas..."
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+        />
+      </div>
+      <select class="form-control filter-select" [(ngModel)]="estadoFiltro" (change)="applyFilters()">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="en_progreso">En Progreso</option>
+        <option value="completada">Completada</option>
+      </select>
+      <select class="form-control filter-select" [(ngModel)]="prioridadFiltro" (change)="applyFilters()">
+        <option value="">Todas las prioridades</option>
+        <option value="baja">Baja</option>
+        <option value="media">Media</option>
+        <option value="alta">Alta</option>
+      </select>
+    </div>
+
+    <!-- KANBAN BOARD -->
+    <div class="kanban-board">
+
+      <!-- Pendientes -->
+      <div class="kanban-col col-pendiente">
+        <div class="kanban-col-header">
+          <div class="col-dot dot-pendiente"></div>
+          <h3>Pendientes</h3>
+          <span class="col-count">{{ getTareasByEstado('pendiente').length }}</span>
+        </div>
+        <div class="kanban-cards">
+          @for (tarea of getTareasByEstado('pendiente'); track tarea.id) {
+            <div class="kanban-card">
+              <div class="kanban-card-header">
+                <span [class]="getPrioridadBadge(tarea.prioridad)">{{ tarea.prioridad }}</span>
+                <div class="card-actions">
+                  <button class="btn btn-ghost btn-sm" title="Mover a En Progreso"
+                    (click)="cambiarEstado(tarea, 'en_progreso')">→</button>
+                  <a [routerLink]="['/tareas', tarea.id]" class="btn btn-ghost btn-sm">👁</a>
+                  <button class="btn btn-danger btn-sm" (click)="confirmDeleteTarea(tarea.id)">✕</button>
+                </div>
+              </div>
+              <h4 class="kanban-titulo">{{ tarea.titulo }}</h4>
+              @if (tarea.descripcion) {
+                <p class="kanban-desc">{{ tarea.descripcion }}</p>
+              }
+              <div class="kanban-footer">
+                @if (tarea.asignado) {
+                  <div class="flex items-center gap-2">
+                    <div class="avatar avatar-sm">{{ getInitials(tarea.asignado.nombre) }}</div>
+                    <span class="text-xs text-muted">{{ tarea.asignado.nombre }}</span>
+                  </div>
+                }
+                @if (tarea.fecha_limite) {
+                  <span class="text-xs text-muted">📅 {{ tarea.fecha_limite | date:'dd/MM' }}</span>
+                }
+              </div>
+            </div>
+          }
+          @if (getTareasByEstado('pendiente').length === 0) {
+            <div class="kanban-empty">Sin tareas pendientes</div>
+          }
+        </div>
+      </div>
+
+      <!-- En Progreso -->
+      <div class="kanban-col col-progreso">
+        <div class="kanban-col-header">
+          <div class="col-dot dot-progreso"></div>
+          <h3>En Progreso</h3>
+          <span class="col-count">{{ getTareasByEstado('en_progreso').length }}</span>
+        </div>
+        <div class="kanban-cards">
+          @for (tarea of getTareasByEstado('en_progreso'); track tarea.id) {
+            <div class="kanban-card">
+              <div class="kanban-card-header">
+                <span [class]="getPrioridadBadge(tarea.prioridad)">{{ tarea.prioridad }}</span>
+                <div class="card-actions">
+                  <button class="btn btn-ghost btn-sm" title="Marcar completada"
+                    (click)="cambiarEstado(tarea, 'completada')">✓</button>
+                  <a [routerLink]="['/tareas', tarea.id]" class="btn btn-ghost btn-sm">👁</a>
+                  <button class="btn btn-danger btn-sm" (click)="confirmDeleteTarea(tarea.id)">✕</button>
+                </div>
+              </div>
+              <h4 class="kanban-titulo">{{ tarea.titulo }}</h4>
+              @if (tarea.descripcion) {
+                <p class="kanban-desc">{{ tarea.descripcion }}</p>
+              }
+              <div class="kanban-footer">
+                @if (tarea.asignado) {
+                  <div class="flex items-center gap-2">
+                    <div class="avatar avatar-sm">{{ getInitials(tarea.asignado.nombre) }}</div>
+                    <span class="text-xs text-muted">{{ tarea.asignado.nombre }}</span>
+                  </div>
+                }
+                @if (tarea.fecha_limite) {
+                  <span class="text-xs text-muted">📅 {{ tarea.fecha_limite | date:'dd/MM' }}</span>
+                }
+              </div>
+            </div>
+          }
+          @if (getTareasByEstado('en_progreso').length === 0) {
+            <div class="kanban-empty">Sin tareas en progreso</div>
+          }
+        </div>
+      </div>
+
+      <!-- Completadas -->
+      <div class="kanban-col col-completada">
+        <div class="kanban-col-header">
+          <div class="col-dot dot-completada"></div>
+          <h3>Completadas</h3>
+          <span class="col-count">{{ getTareasByEstado('completada').length }}</span>
+        </div>
+        <div class="kanban-cards">
+          @for (tarea of getTareasByEstado('completada'); track tarea.id) {
+            <div class="kanban-card card-done">
+              <div class="kanban-card-header">
+                <span [class]="getPrioridadBadge(tarea.prioridad)">{{ tarea.prioridad }}</span>
+                <div class="card-actions">
+                  <button class="btn btn-ghost btn-sm" title="Mover a pendiente"
+                    (click)="cambiarEstado(tarea, 'pendiente')">↩</button>
+                  <a [routerLink]="['/tareas', tarea.id]" class="btn btn-ghost btn-sm">👁</a>
+                  <button class="btn btn-danger btn-sm" (click)="confirmDeleteTarea(tarea.id)">✕</button>
+                </div>
+              </div>
+              <h4 class="kanban-titulo done">{{ tarea.titulo }}</h4>
+              <div class="kanban-footer">
+                @if (tarea.asignado) {
+                  <div class="flex items-center gap-2">
+                    <div class="avatar avatar-sm">{{ getInitials(tarea.asignado.nombre) }}</div>
+                    <span class="text-xs text-muted">{{ tarea.asignado.nombre }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          @if (getTareasByEstado('completada').length === 0) {
+            <div class="kanban-empty">Sin tareas completadas</div>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+</div>

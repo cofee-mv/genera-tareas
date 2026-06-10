@@ -1,0 +1,131 @@
+<div class="container-form">
+  <div class="encabezado">
+    <h1>{{ editando ? 'Editar Tarea' : 'Nueva Tarea' }}</h1>
+  </div>
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="formulario">
+    <!-- Mensajes -->
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+    <div *ngIf="exitoso" class="alert alert-exito">
+      Tarea {{ editando ? 'actualizada' : 'creada' }} exitosamente. Redirigiendo...
+    </div>
+
+    <!-- Título -->
+    <div class="grupo-formulario">
+      <label for="titulo" class="etiqueta">Título *</label>
+      <input
+        type="text"
+        id="titulo"
+        formControlName="titulo"
+        placeholder="Ingrese el título de la tarea"
+        class="entrada"
+        [class.error]="titulo?.invalid && titulo?.touched"
+      />
+      <div *ngIf="titulo?.invalid && titulo?.touched" class="error-mensaje">
+        <span *ngIf="titulo?.errors?.['required']">El título es requerido</span>
+        <span *ngIf="titulo?.errors?.['minlength']">El título debe tener al menos 3 caracteres</span>
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="grupo-formulario">
+      <label for="descripcion" class="etiqueta">Descripción</label>
+      <textarea
+        id="descripcion"
+        formControlName="descripcion"
+        placeholder="Ingrese la descripción de la tarea"
+        class="entrada"
+        rows="4"
+      ></textarea>
+    </div>
+
+    <!-- Proyecto -->
+    <div class="grupo-formulario">
+      <label for="proyecto_id" class="etiqueta">Proyecto *</label>
+      <select
+        id="proyecto_id"
+        formControlName="proyecto_id"
+        class="entrada"
+        [class.error]="proyecto_id?.invalid && proyecto_id?.touched"
+      >
+        <option value="" disabled>Seleccione un proyecto</option>
+        <option *ngFor="let p of proyectos" [value]="p.id">{{ p.nombre }}</option>
+      </select>
+      <div *ngIf="proyecto_id?.invalid && proyecto_id?.touched" class="error-mensaje">
+        <span *ngIf="proyecto_id?.errors?.['required']">El proyecto es requerido</span>
+      </div>
+    </div>
+
+    <!-- Usuario Asignado -->
+    <div class="grupo-formulario">
+      <label for="usuario_asignado_id" class="etiqueta">Asignar a</label>
+      <select
+        id="usuario_asignado_id"
+        formControlName="usuario_asignado_id"
+        class="entrada"
+      >
+        <option value="">Sin asignar</option>
+        <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nombre }}</option>
+      </select>
+    </div>
+
+    <!-- Fila con Prioridad y Estado -->
+    <div class="fila">
+      <div class="grupo-formulario">
+        <label for="prioridad" class="etiqueta">Prioridad *</label>
+        <select
+          id="prioridad"
+          formControlName="prioridad"
+          class="entrada"
+        >
+          <option value="baja">Baja</option>
+          <option value="media">Media</option>
+          <option value="alta">Alta</option>
+        </select>
+      </div>
+
+      <div class="grupo-formulario">
+        <label for="estado" class="etiqueta">Estado *</label>
+        <select
+          id="estado"
+          formControlName="estado"
+          class="entrada"
+        >
+          <option value="pendiente">Pendiente</option>
+          <option value="en_progreso">En Progreso</option>
+          <option value="completada">Completada</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Fecha Límite -->
+    <div class="grupo-formulario">
+      <label for="fecha_limite" class="etiqueta">Fecha Límite</label>
+      <input
+        type="date"
+        id="fecha_limite"
+        formControlName="fecha_limite"
+        class="entrada"
+      />
+    </div>
+
+    <!-- Botones -->
+    <div class="grupo-botones">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="cargando || formulario.invalid"
+      >
+        {{ cargando ? 'Guardando...' : editando ? 'Actualizar' : 'Crear' }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-secundario"
+        (click)="cancelar()"
+        [disabled]="cargando"
+      >
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

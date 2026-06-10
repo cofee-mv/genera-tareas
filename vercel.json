@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm start",
+  "installCommand": "npm install",
+  "framework": "angular",
+  "nodeVersion": "18.x",
+  "env": {
+    "NG_APP_SUPABASE_URL": "@ng_app_supabase_url",
+    "NG_APP_SUPABASE_ANON_KEY": "@ng_app_supabase_anon_key"
+  }
+}

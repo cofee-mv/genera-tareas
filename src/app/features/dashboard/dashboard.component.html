@@ -1,0 +1,187 @@
+<!-- src/app/features/dashboard/dashboard.component.html -->
+<div class="dashboard-page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Bienvenido, {{ authService.usuario()?.nombre }} 👋</p>
+    </div>
+    <div class="page-actions">
+      <a routerLink="/proyectos/nuevo" class="btn btn-secondary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nuevo Proyecto
+      </a>
+      <a routerLink="/tareas/nueva" class="btn btn-primary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nueva Tarea
+      </a>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Cargando estadísticas...</p>
+    </div>
+  } @else {
+
+    <!-- STATS CARDS -->
+    @if (stats()) {
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon stat-icon-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 7l9-4 9 4v10l-9 4-9-4z"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats()!.total_proyectos }}</div>
+            <div class="stat-label">Total Proyectos</div>
+          </div>
+          <div class="stat-sub">{{ stats()!.proyectos_activos }} activos</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon stat-icon-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4"/>
+              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats()!.total_tareas }}</div>
+            <div class="stat-label">Total Tareas</div>
+          </div>
+          <div class="stat-sub">{{ getCompletionPercentage() }}% completadas</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon stat-icon-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats()!.tareas_pendientes }}</div>
+            <div class="stat-label">Pendientes</div>
+          </div>
+          <div class="stat-sub stat-warn">Requieren atención</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon stat-icon-cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats()!.tareas_en_progreso }}</div>
+            <div class="stat-label">En Progreso</div>
+          </div>
+          <div class="stat-sub stat-info">En ejecución</div>
+        </div>
+
+        <div class="stat-card stat-card-success">
+          <div class="stat-icon stat-icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats()!.tareas_completadas }}</div>
+            <div class="stat-label">Completadas</div>
+          </div>
+          <div class="stat-sub stat-success">¡Excelente trabajo!</div>
+        </div>
+      </div>
+
+      <!-- PROGRESS GLOBAL -->
+      <div class="card progress-card">
+        <div class="card-header">
+          <h3 class="card-title">Progreso Global</h3>
+          <span class="progress-pct">{{ getCompletionPercentage() }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" [style.width.%]="getCompletionPercentage()"></div>
+        </div>
+        <div class="progress-legend">
+          <span class="legend-item">
+            <span class="legend-dot pending"></span> Pendientes ({{ stats()!.tareas_pendientes }})
+          </span>
+          <span class="legend-item">
+            <span class="legend-dot progress"></span> En Progreso ({{ stats()!.tareas_en_progreso }})
+          </span>
+          <span class="legend-item">
+            <span class="legend-dot done"></span> Completadas ({{ stats()!.tareas_completadas }})
+          </span>
+        </div>
+      </div>
+    }
+
+    <!-- MIS TAREAS RECIENTES -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Mis Tareas Recientes</h3>
+        <a routerLink="/tareas" class="btn btn-ghost btn-sm">Ver todas →</a>
+      </div>
+
+      @if (misTareas().length === 0) {
+        <div class="empty-state" style="padding:32px;">
+          <span class="empty-state-icon">📋</span>
+          <h3>Sin tareas asignadas</h3>
+          <p>Crea una nueva tarea o pide que te asignen una.</p>
+          <a routerLink="/tareas/nueva" class="btn btn-primary btn-sm mt-4">Crear Tarea</a>
+        </div>
+      } @else {
+        <div class="tareas-list">
+          @for (tarea of misTareas(); track tarea.id) {
+            <a [routerLink]="['/tareas', tarea.id]" class="tarea-row">
+              <div class="tarea-info">
+                <div class="tarea-titulo">{{ tarea.titulo }}</div>
+                <div class="tarea-meta text-xs text-muted">
+                  {{ tarea.proyecto?.nombre }} •
+                  @if (tarea.fecha_limite) {
+                    <span [class.text-danger]="isVencida(tarea.fecha_limite)">
+                      Vence: {{ tarea.fecha_limite | date:'dd/MM/yyyy' }}
+                    </span>
+                  }
+                </div>
+              </div>
+              <div class="tarea-badges">
+                <span [class]="getPrioridadBadge(tarea.prioridad)">{{ tarea.prioridad }}</span>
+                <span [class]="getEstadoBadge(tarea.estado)">{{ getEstadoLabel(tarea.estado) }}</span>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="quick-links">
+      <a routerLink="/proyectos" class="quick-link-card">
+        <div class="quick-icon">📁</div>
+        <div class="quick-label">Ver Proyectos</div>
+      </a>
+      <a routerLink="/tareas" class="quick-link-card">
+        <div class="quick-icon">✅</div>
+        <div class="quick-label">Ver Tareas</div>
+      </a>
+      <a routerLink="/proyectos/nuevo" class="quick-link-card">
+        <div class="quick-icon">➕</div>
+        <div class="quick-label">Nuevo Proyecto</div>
+      </a>
+      <a routerLink="/perfil" class="quick-link-card">
+        <div class="quick-icon">👤</div>
+        <div class="quick-label">Mi Perfil</div>
+      </a>
+    </div>
+
+  }
+</div>
