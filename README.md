@@ -59,9 +59,7 @@ Task Manager CBA es una aplicación web CRUD completa que implementa un sistema 
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/task-manager-cba.git
-cd task-manager-cba
-```
+git clone https://github.com/cofee-mv/genera-tareas.git
 
 ### 2. Instalar Dependencias
 
