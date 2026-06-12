@@ -143,44 +143,13 @@ src/app/
 
 ---
 
-## 🚀 Despliegue en Vercel
-
-1. Push a GitHub:
-```bash
-git add .
-git commit -m "Deploy"
-git push origin main
-```
-
-2. Ve a [vercel.com](https://vercel.com) y conecta tu repositorio
-
-3. Agrega variables de entorno en Vercel:
-   - `NG_APP_SUPABASE_URL`
-   - `NG_APP_SUPABASE_ANON_KEY`
-
-4. Vercel desplegará automáticamente
-
----
-
-## 🧪 Comandos Disponibles
-
-```bash
 npm start           # Servir en localhost:4200
 npm run build       # Compilar para producción
 npm test            # Ejecutar tests
 ```
+<img width="654" height="651" alt="image" src="https://github.com/user-attachments/assets/ee039976-fe2d-4186-af8f-67e44ec53385" />
 
----
 
-## 📄 Licencia
-
-MIT License - Ver `LICENSE` para detalles.
-
----
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Abre un Pull Request con tus mejoras.
 
 ---
 
