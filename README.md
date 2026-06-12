@@ -141,15 +141,6 @@ src/app/
 /usuarios                - Gestión de usuarios (admin)
 ```
 
----
-
-npm start           # Servir en localhost:4200
-npm run build       # Compilar para producción
-npm test            # Ejecutar tests
-```
-
-
-
 
 ---
 
