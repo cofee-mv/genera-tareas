@@ -147,7 +147,7 @@ npm start           # Servir en localhost:4200
 npm run build       # Compilar para producción
 npm test            # Ejecutar tests
 ```
-<img width="654" height="651" alt="image" src="https://github.com/user-attachments/assets/ee039976-fe2d-4186-af8f-67e44ec53385" />
+
 
 
 
