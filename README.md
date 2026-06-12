@@ -89,6 +89,10 @@ npm start
 ```
 
 Abre `http://localhost:4200/`
+---
+
+## 📋 Url del sistema desplegado
+`https://genera-tareas.vercel.app/auth/login` 
 
 ---
 
@@ -138,9 +142,6 @@ src/app/
 /tareas/:id              - Detalle de tarea
 /usuarios                - Gestión de usuarios (admin)
 ````ç
-## 📋 Url del sistema desplegado
-`https://genera-tareas.vercel.app/auth/login` 
 
----
 
-**Desarrollado por CBA - Formación Digital** ⭐
+
